@@ -40,6 +40,7 @@ class AutoTellerMachine {         //Object to represent each customer           
     double GetBeginningBalance(int accountID) const;
     char GetLastOperation(int accountID) const;
     string GetUsername(int accountID) const;
+    void logout();
 
     private:
     int loggedInAccountLocation;
@@ -57,6 +58,10 @@ vector<AutoTellerMachine> AccountList;  //This vector allows for multiple accoun
 
 void AccountMenu();
 void UserMenu();
+
+void AutoTellerMachine:: logout(){
+	loggedInAccountLocation = -1;
+}
 
 void AutoTellerMachine:: SetAccountLogin(int setAccountLocation) {
 
@@ -314,7 +319,7 @@ int main(int argc, char* argv[])
  	int porta;
 
  	if(argc < 3) {
-		cout << "Usage: ./testesrv -p <port>";
+		cout << "Usage: ./server -p <port>";
 		exit(1);
 	}
 	for(int i=1; i<argc; i++) {
@@ -364,6 +369,7 @@ int main(int argc, char* argv[])
   	size_t pos = 0;
   	std::vector<std::string> parsed;
   	std::string NewStr;
+  	std::string::size_type sz;
 
   	while(1)
   	{	
@@ -390,6 +396,30 @@ int main(int argc, char* argv[])
   						if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
   							printf("ACK SENDED\n");
   					}
+  					parsed.clear();
+  					NewStr.clear();
+  					break;
+  				case 'c':
+  					NewStr.assign(recvbuf, 1024);
+  					while((pos = NewStr.find(delimiter)) != std::string::npos) {
+  						parsed.push_back(NewStr.substr(0, pos));
+  						NewStr.erase(0, pos + delimiter.length());
+  					}
+  					account.CreateNewAccount(parsed[1], parsed[2]);
+  					if(account.AccountLogin(parsed[1], parsed[2])==0){
+  						account.DepositMoney(atof(parsed[3].c_str()));
+  						std::cout<<atof(parsed[3].c_str())<<std::endl;
+  						account.logout();
+  					}
+  					else{
+  						if ((send(s_cli, (const char *)&nack, sizeof(nack),0)) > 0)
+  							printf("NACK SENDED\n");
+  					}
+
+  					if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
+  							printf("ACK SENDED\n");
+  					parsed.clear();
+  					NewStr.clear();
   					break;
 
   				default:
