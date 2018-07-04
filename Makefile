@@ -1,2 +1,7 @@
 all:
-	g++ atm.cpp -o atm
+	g++ atm.cpp -o server
+	g++ client.cpp -o client
+client:
+	g++ client.cpp -o client
+server:
+	g++ atm.cpp -o server
