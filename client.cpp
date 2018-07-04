@@ -45,8 +45,8 @@ void UserMenu() {   //Implements a user interface that allows the user to make s
     int ret = 0;
 
     cout << "l -> Login" << endl;
-    cout << "c -> Create New Account" << endl;
-    cout << "q -> Quit" << endl << endl << ">";
+    cout << "c -> Criar nova conta" << endl;
+    cout << "q -> Sair" << endl << endl << ">";
     cin >> userSelection;
 
     if((userSelection == 'l') || (userSelection == 'L')) {  //Checks to make sure the login is valid and if not, couts an error statement
@@ -106,6 +106,8 @@ void UserMenu() {   //Implements a user interface that allows the user to make s
     }
     else if((userSelection == 'q') || (userSelection == 'Q')) {   //Exits the entire program
 
+        command = "q";
+        send(sock , command.c_str() , command.length() , 0);
         cout << endl << "Saindo da aplicação" << endl << endl;
     }
     else {
@@ -119,93 +121,120 @@ void UserMenu() {   //Implements a user interface that allows the user to make s
 
 void AccountMenu() {         //This is a separate menu from the user menu because it deals with all options available to a logged in customer
 
-    // char userInput;
-    // double amountOfDeposit;
-    // double amountOfWithdrawal;
+    char userInput;
+    double amountOfDeposit;
+    double amountOfWithdrawal;
 
-    // cout << endl << "d -> Deposit Money" << endl;   //This has a couple more options than indicated in our project overview, but I feel they make this a more useable program
-    // cout << "w -> Withdraw Money" << endl;
-    // cout << "r -> Request Balance" << endl;
-    // cout << "z -> Logout" << endl;
-    // cout << "q -> Quit" << endl;
-    // cout << endl << ">";
-    // cin >> userInput;
+    string command;
+    int ret = 0;
 
-    // if((userInput == 'd') || (userInput == 'D')) {      //Deposit function that changes the balance of the account user and sets the last money movement for later use
+    cout << endl << "d -> Depositar dinherio" << endl;   //This has a couple more options than indicated in our project overview, but I feel they make this a more useable program
+    cout << "w -> Retirar dinheiro" << endl;
+    cout << "r -> Verificar saldo da conta" << endl;
+    cout << "z -> Logout" << endl;
+    cout << "q -> Sair" << endl;
+    cout << endl << ">";
+    cin >> userInput;
 
-    //     SetBeginningBalance(GetAccountLogin());
-    //     cout << endl <<  "Amount of deposit: " << endl;
-    //     cin >> amountOfDeposit;
-    //     SetLastMoneyMovement(GetAccountLogin(), amountOfDeposit);
-    //     SetLastOperation(GetAccountLogin(), userInput);
-    //     DepositMoney(amountOfDeposit);
-    //     AccountMenu();
-    // }        
+    if((userInput == 'd') || (userInput == 'D')) {      //Deposit function that changes the balance of the account user and sets the last money movement for later use
+        
+        cout << endl <<  "Amount of deposit: " << endl;
+        cin >> amountOfDeposit;
 
-    // else if((userInput == 'w') || (userInput == 'W')) {   //Withdraw function makes sure that enough funds are present for the operation before removing money
+        command = "d|" + to_string(amountOfDeposit);
 
-    //     cout << endl << "Amount of withdrawal: " << endl;
-    //     cin >> amountOfWithdrawal;
+        send(sock , command.c_str() , command.length() , 0);
 
-    //     if(amountOfWithdrawal > GetAccountBalance(GetAccountLogin())) {
+        ret = recv(sock , buffer, 1024, 0);
 
-    //         cout << endl << "******Insfficient Funds!*******" << endl;
-    //     }
+        if(ret > 0)
+        {
+            if(buffer[0] == '1')
+                cout << "Erro ao depositar novo valor" << endl;
+            else
+                cout << "Valor depositado com sucesso" << endl;
+        }
+        else
+            cout << "Erro de comunicação com o servidor" << endl;
 
-    //     else {
+        AccountMenu();
+    }        
 
-    //        SetBeginningBalance(GetAccountLogin());
-    //        SetLastMoneyMovement(GetAccountLogin(), amountOfWithdrawal);
-    //        SetLastOperation(GetAccountLogin(), userInput);
-    //        WithdrawMoney(amountOfWithdrawal);
-    //     }
+    else if((userInput == 'w') || (userInput == 'W')) {   //Withdraw function makes sure that enough funds are present for the operation before removing money
 
-    //     AccountMenu();
-    // }
+        cout << endl << "Quantidade à ser retirada: " << endl;
+        cin >> amountOfWithdrawal;
 
-    // else if((userInput == 'r') || (userInput == 'R')) {   //Simply prints the balance before the last transaction, what type and amount the last transaction was then the current balance
+        command = "w|"+ to_string(amountOfWithdrawal);
 
-    //     cout << endl << "Beginning balance: $" << fixed << setprecision(2) << GetBeginningBalance(GetAccountLogin()) << endl;
+        send(sock , command.c_str() , command.length() , 0);
 
-    //     if(GetLastOperation(GetAccountLogin()) == 'd') {
+        ret = recv(sock , buffer, 1024, 0);
 
-    //         cout << "Deposit amount: $" << fixed << setprecision(2) << GetLastMoneyMovement(GetAccountLogin()) << endl;
-    //     }
+        if(ret > 0)
+        {
+            if(buffer[0] == '1')
+                cout << "Erro ao depositar novo valor" << endl;
+            else if(buffer[0] == '2')
+                cout << endl << "******Saldo insuficiente!*******" << endl;
+            else
+                cout << "Valor retirado com sucesso" << endl;
+        }
+        else
+            cout << "Erro de comunicação com o servidor" << endl;
 
-    //     else if(GetLastOperation(GetAccountLogin()) == 'w') {
+        AccountMenu();
+    }
 
-    //         cout << "Withdrawal amount: $" << fixed << setprecision(2) << GetLastMoneyMovement(GetAccountLogin()) << endl;
-    //     }
+    else if((userInput == 'r') || (userInput == 'R')) {   //Simply prints the balance before the last transaction, what type and amount the last transaction was then the current balance
 
-    //     cout << "Your balance is $" << fixed << setprecision(2) << GetAccountBalance(GetAccountLogin()) << endl;
+        command = "r";
 
-    //     AccountMenu();
-    // }
+        send(sock , command.c_str() , command.length() , 0);
 
-    // else if((userInput == 'z') || (userInput == 'Z')) {   //Allows the user to logout of their account and brings them back to the user menu so they can log in with a different account
+        ret = recv(sock , buffer, 1024, 0);
 
-    //     cout << endl << "You have successfully logged out, " << GetUsername(GetAccountLogin()) << "!" << endl << endl;
-    //     UserMenu();
-    // }
+        if(ret > 0)
+        {
+            if(buffer[0] == '1')
+                cout << "Erro ao depositar novo valor" << endl;
+            else
+            {
+                string saldoAtual = &buffer[1];
+                cout << "Saldo atual: " << saldoAtual << endl;
+            }
+        }
+        else
+            cout << "Erro de comunicação com o servidor" << endl;
 
-    // else if((userInput == 'q') || (userInput == 'Q')) {  //Exits the entire program
+        AccountMenu();
+    }
 
-    //     cout << endl << "Thanks for banking with COP2513.F16, " << GetUsername(GetAccountLogin()) << "!" << endl;
-    // }
+    else if((userInput == 'z') || (userInput == 'Z')) {   //Allows the user to logout of their account and brings them back to the user menu so they can log in with a different account
 
-    // else {
+        command = "z";
+        send(sock , command.c_str() , command.length() , 0);
 
-    //     cout << endl << "Invalid selection." << endl;
-    //     AccountMenu();
-    // }
+        UserMenu();
+    }
 
-    // return;
+    else if((userInput == 'q') || (userInput == 'Q')) {  //Exits the entire program
+
+        command = "q";
+        send(sock , command.c_str() , command.length() , 0);
+        cout << endl << "Saindo da aplicação" << endl << endl;
+    }
+
+    else {
+
+        cout << endl << "Comando inválido" << endl;
+        AccountMenu();
+    }
+
+    return;
 }
 
 int main() { 
-
-    cout << "Bem vindo à central de auto-atendimento Airton Sena" << endl << endl;
-    cout << "Por favor, selecione a opção desejada no menu abaixo;" << endl << endl;
 
     struct sockaddr_in address;
     struct sockaddr_in serv_addr;
@@ -233,6 +262,9 @@ int main() {
         printf("\n Conexão falhou \n");
         return -1;
     }
+
+    cout << "Bem vindo à central de auto-atendimento Airton Sena" << endl << endl;
+    cout << "Por favor, selecione a opção desejada no menu abaixo;" << endl << endl;
 
     UserMenu();
 
