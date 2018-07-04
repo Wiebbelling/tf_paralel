@@ -109,6 +109,20 @@ void UserMenu() {   //Implements a user interface that allows the user to make s
         command = "q";
         send(sock , command.c_str() , command.length() , 0);
         cout << endl << "Saindo da aplicação" << endl << endl;
+
+        ret = recv(sock , buffer, 1024, 0);
+
+        if(ret > 0)
+        {
+            if(buffer[0] == '1')
+                cout << "Erro ao fechar comunucacao" << endl;
+            else
+                cout << "Comunicaçao Finalizada " << endl;
+            
+        }
+        else
+            cout << "Erro de comunicação com o servidor" << endl;
+
     }
     else {
 
@@ -192,6 +206,8 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
 
         send(sock , command.c_str() , command.length() , 0);
 
+        memset(buffer, 0, strlen(buffer));
+        
         ret = recv(sock , buffer, 1024, 0);
 
         if(ret > 0)
@@ -223,6 +239,19 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
         command = "q";
         send(sock , command.c_str() , command.length() , 0);
         cout << endl << "Saindo da aplicação" << endl << endl;
+
+        ret = recv(sock , buffer, 1024, 0);
+
+        if(ret > 0)
+        {
+            if(buffer[0] == '1')
+                cout << "Erro ao fechar comunucacao" << endl;
+            else
+                cout << "Comunicaçao Finalizada " << endl;
+            
+        }
+        else
+            cout << "Erro de comunicação com o servidor" << endl;
     }
 
     else {

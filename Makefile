@@ -1,10 +1,10 @@
 all:
-	g++ atm.cpp -o server
+	g++ atmServer.cpp -o server
 	g++ client.cpp -o client
 client:
 	g++ client.cpp -o client
 server:
-	g++ atm.cpp -o server
+	g++ atmServer.cpp -o server
 
 clean:
 	rm server
