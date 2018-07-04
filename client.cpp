@@ -56,7 +56,7 @@ void UserMenu() {   //Implements a user interface that allows the user to make s
         cout << "Por favor, digite a sua senha: " << endl;
         cin >> passwordCheck;
 
-        command = "l|" + usernameCheck + "|" + passwordCheck;
+        command = "l|" + usernameCheck + "|" + passwordCheck + "|";
 
         send(sock , command.c_str() , command.length() , 0);
 
@@ -86,7 +86,7 @@ void UserMenu() {   //Implements a user interface that allows the user to make s
         cout << "Por favor, digite o saldo inicial da sua conta: " << endl;
         cin >> amountOfDeposit;
 
-        command = "c|" + createUserId + "|" + createUserPass + "|" + to_string(amountOfDeposit);
+        command = "c|" + createUserId + "|" + createUserPass + "|" + to_string(amountOfDeposit)+ "|";
 
         send(sock , command.c_str() , command.length() , 0);
         
@@ -106,7 +106,7 @@ void UserMenu() {   //Implements a user interface that allows the user to make s
     }
     else if((userSelection == 'q') || (userSelection == 'Q')) {   //Exits the entire program
 
-        command = "q";
+        command = "q|";
         send(sock , command.c_str() , command.length() , 0);
         cout << endl << "Saindo da aplicação" << endl << endl;
 
@@ -155,7 +155,7 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
         cout << endl <<  "Amount of deposit: " << endl;
         cin >> amountOfDeposit;
 
-        command = "d|" + to_string(amountOfDeposit);
+        command = "d|" + to_string(amountOfDeposit) + "|";
 
         send(sock , command.c_str() , command.length() , 0);
 
@@ -179,7 +179,7 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
         cout << endl << "Quantidade à ser retirada: " << endl;
         cin >> amountOfWithdrawal;
 
-        command = "w|"+ to_string(amountOfWithdrawal);
+        command = "w|"+ to_string(amountOfWithdrawal) + "|";
 
         send(sock , command.c_str() , command.length() , 0);
 
@@ -202,12 +202,12 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
 
     else if((userInput == 'r') || (userInput == 'R')) {   //Simply prints the balance before the last transaction, what type and amount the last transaction was then the current balance
 
-        command = "r";
+        command = "r|";
 
         send(sock , command.c_str() , command.length() , 0);
 
         memset(buffer, 0, strlen(buffer));
-        
+
         ret = recv(sock , buffer, 1024, 0);
 
         if(ret > 0)
@@ -228,7 +228,7 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
 
     else if((userInput == 'z') || (userInput == 'Z')) {   //Allows the user to logout of their account and brings them back to the user menu so they can log in with a different account
 
-        command = "z";
+        command = "z|";
         send(sock , command.c_str() , command.length() , 0);
 
         UserMenu();
@@ -236,7 +236,7 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
 
     else if((userInput == 'q') || (userInput == 'Q')) {  //Exits the entire program
 
-        command = "q";
+        command = "q|";
         send(sock , command.c_str() , command.length() , 0);
         cout << endl << "Saindo da aplicação" << endl << endl;
 
