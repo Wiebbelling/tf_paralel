@@ -29,6 +29,7 @@ class AutoTellerMachine {         //Object to represent each customer           
     int AccountLogin(string loginUsername, string loginPassword);
     void DepositMoney(double depositAmount);
     void WithdrawMoney(double withdrawalAmount);
+    int Withdraw(double withdrawalAmount);
     void SetAccountLogin(int setAccountLocation);
     void SetLastMoneyMovement(int accountID, double amount);
     void SetBeginningBalance(int accountID);
@@ -226,6 +227,16 @@ void UserMenu() {   //Implements a user interface that allows the user to make s
     return;
 }
 
+int AutoTellerMachine::Withdraw(double withdrawalAmount){
+    if(withdrawalAmount > GetAccountBalance(GetAccountLogin())) {
+        return 1;
+    }
+    else{
+        return 0;
+    }
+
+}
+
 void AutoTellerMachine::AccountMenu() {         //This is a separate menu from the user menu because it deals with all options available to a logged in customer
 
     char userInput;
@@ -365,6 +376,7 @@ int main(int argc, char* argv[])
 
   	char ack[10] = "0";
   	char nack[10] = "1";
+    char saldo[10] = "2";
   	std::string delimiter = "|";
   	size_t pos = 0;
   	std::vector<std::string> parsed;
@@ -374,8 +386,7 @@ int main(int argc, char* argv[])
   	while(1)
   	{	
   		memset(recvbuf, '\0', 1024);
-  		if((recv(s_cli, recvbuf, MAX_PACKET, 0)) > 0)
-      {
+  		if((recv(s_cli, recvbuf, MAX_PACKET, 0)) > 0){
   			printf("Message Received: %s\n", recvbuf);
   			switch(recvbuf[0]){
   				case 'q':
@@ -406,11 +417,10 @@ int main(int argc, char* argv[])
   						parsed.push_back(NewStr.substr(0, pos));
   						NewStr.erase(0, pos + delimiter.length());
   					}
-            AccountList.push_back(account);
+                    AccountList.push_back(account);
   					account.CreateNewAccount(parsed[1], parsed[2]);
-  					if(account.AccountLogin(parsed[1], parsed[2])==0)
-            {
-              account.DepositMoney(atof(parsed[3].c_str()));
+  					if(account.AccountLogin(parsed[1], parsed[2])==0){
+                        account.DepositMoney(atof(parsed[3].c_str()));
   						account.logout();
   					}
   					else{
@@ -423,6 +433,49 @@ int main(int argc, char* argv[])
   					parsed.clear();
   					NewStr.clear();
   					break;
+                case 'd':
+                    NewStr.assign(recvbuf, 1024);
+                    while((pos = NewStr.find(delimiter)) != std::string::npos){
+                        parsed.push_back(NewStr.substr(0, pos));
+                        NewStr.erase(0, pos+delimiter.length());
+                    }
+                    account.SetBeginningBalance(account.GetAccountLogin());
+                    account.SetLastMoneyMovement(account.GetAccountLogin(), atof(parsed[1].c_str()));
+                    account.SetLastOperation(account.GetAccountLogin(), recvbuf[0]);
+                    account.DepositMoney(atof(parsed[1].c_str()));
+                    if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
+                        printf("ACK SENDED\n");
+                        parsed.clear();
+                        NewStr.clear();
+                    break;
+                case 'w':
+                    NewStr.assign(recvbuf, 1024);
+                    while((pos = NewStr.find(delimiter)) != std::string::npos){
+                        parsed.push_back(NewStr.substr(0, pos));
+                        NewStr.erase(0, pos+delimiter.length());
+                    }
+                    account.SetBeginningBalance(account.GetAccountLogin());
+                    if(account.Withdraw(atof(parsed[1].c_str()))==1){
+                        if ((send(s_cli, (const char *)&saldo, sizeof(saldo),0)) > 0)
+                            printf("SALDO INSUFICIENTE SENDED\n");
+                    }
+                    else{
+                        account.SetLastMoneyMovement(account.GetAccountLogin(), atof(parsed[1].c_str()));
+                        account.SetLastOperation(account.GetAccountLogin(), recvbuf[0]);
+                        account.WithdrawMoney(atof(parsed[1].c_str()));
+                        if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
+                            printf("ACK SENDED\n");
+                    }
+                    parsed.clear();
+                    NewStr.clear();
+                    break;
+                case 'r':
+                    NewStr.assign(recvbuf, 1024);
+                    while((pos = NewStr.find(delimiter)) != std::string::npos){
+                        parsed.push_back(NewStr.substr(0, pos));
+                        NewStr.erase(0, pos+delimiter,length());
+                    }
+                    break;
 
   				default:
   					break;
