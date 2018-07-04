@@ -65,15 +65,18 @@ void UserMenu() {   //Implements a user interface that allows the user to make s
         if(ret > 0)
         {
             if(buffer[0] == '1')
+            {
                 cout << "Usuário ou senha incorretos" << endl;
+                UserMenu();
+            }
             else
                 AccountMenu();
         }
         else
+        {
             cout << "Erro de comunicação com o servidor" << endl;
-
-        UserMenu();
-
+            UserMenu();
+        }
         
     }
     else if((userSelection == 'c') || (userSelection == 'C')) {  //Captures info for a new account
@@ -172,7 +175,6 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
 
         AccountMenu();
     }        
-
     else if((userInput == 'w') || (userInput == 'W')) {   //Withdraw function makes sure that enough funds are present for the operation before removing money
 
         cout << endl << "Quantidade à ser retirada: " << endl;
@@ -198,7 +200,6 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
 
         AccountMenu();
     }
-
     else if((userInput == 'r') || (userInput == 'R')) {   //Simply prints the balance before the last transaction, what type and amount the last transaction was then the current balance
 
         command = "r|";
@@ -224,7 +225,6 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
 
         AccountMenu();
     }
-
     else if((userInput == 'z') || (userInput == 'Z')) {   //Allows the user to logout of their account and brings them back to the user menu so they can log in with a different account
 
         command = "z|";
@@ -232,7 +232,6 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
 
         UserMenu();
     }
-
     else if((userInput == 'q') || (userInput == 'Q')) {  //Exits the entire program
 
         command = "q|";
@@ -252,7 +251,6 @@ void AccountMenu() {         //This is a separate menu from the user menu becaus
         else
             cout << "Erro de comunicação com o servidor" << endl;
     }
-
     else {
 
         cout << endl << "Comando inválido" << endl;

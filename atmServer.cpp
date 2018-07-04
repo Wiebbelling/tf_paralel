@@ -374,7 +374,8 @@ int main(int argc, char* argv[])
   	while(1)
   	{	
   		memset(recvbuf, '\0', 1024);
-  		if((recv(s_cli, recvbuf, MAX_PACKET, 0)) > 0){
+  		if((recv(s_cli, recvbuf, MAX_PACKET, 0)) > 0)
+      {
   			printf("Message Received: %s\n", recvbuf);
   			switch(recvbuf[0]){
   				case 'q':
@@ -427,11 +428,6 @@ int main(int argc, char* argv[])
   					break;
   			}
   		}
-    	if (recv(s_cli, recvbuf, MAX_PACKET, 0))
-    	{
-      		close(s_cli);
-	  		TrataErro(s, RECEIVE);
-    	}
     }
 
   printf("Fim da conexao\n");
