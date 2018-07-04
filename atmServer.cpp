@@ -405,10 +405,11 @@ int main(int argc, char* argv[])
   						parsed.push_back(NewStr.substr(0, pos));
   						NewStr.erase(0, pos + delimiter.length());
   					}
+            AccountList.push_back(account);
   					account.CreateNewAccount(parsed[1], parsed[2]);
-  					if(account.AccountLogin(parsed[1], parsed[2])==0){
-  						account.DepositMoney(atof(parsed[3].c_str()));
-  						std::cout<<atof(parsed[3].c_str())<<std::endl;
+  					if(account.AccountLogin(parsed[1], parsed[2])==0)
+            {
+              account.DepositMoney(atof(parsed[3].c_str()));
   						account.logout();
   					}
   					else{
