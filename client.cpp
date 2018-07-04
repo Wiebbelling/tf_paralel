@@ -70,10 +70,9 @@ void UserMenu() {   //Implements a user interface that allows the user to make s
                 AccountMenu();
         }
         else
-        {
             cout << "Erro de comunicação com o servidor" << endl;
-            UserMenu();
-        }
+
+        UserMenu();
 
         
     }
