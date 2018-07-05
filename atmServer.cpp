@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sstream>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -378,10 +379,15 @@ int main(int argc, char* argv[])
   	char nack[10] = "1";
     char saldo[10] = "2";
   	std::string delimiter = "|";
+    char valorEmConta[30];
+    double saldoConta;
   	size_t pos = 0;
   	std::vector<std::string> parsed;
   	std::string NewStr;
   	std::string::size_type sz;
+    std::ostringstream saldoContaStr;
+    std::string stringConversao;
+
 
   	while(1)
   	{	
@@ -475,6 +481,16 @@ int main(int argc, char* argv[])
                         parsed.push_back(NewStr.substr(0, pos));
                         NewStr.erase(0, pos+delimiter.length());
                     }
+                    saldoConta = account.GetAccountBalance(account.GetAccountLogin());
+                    saldoContaStr << saldoConta;
+                    stringConversao = saldoContaStr.str();
+                    memset(valorEmConta, '\0', 30);
+                    strcpy(&valorEmConta[1], stringConversao.c_str());
+                    if ((send(s_cli, (const char *)&valorEmConta, sizeof(valorEmConta),0)) > 0)
+                        printf("SALDO SENDED\n");
+                    break;
+                case 'z':
+                    account.logout();
                     break;
 
   				default:
