@@ -473,7 +473,7 @@ int main(int argc, char* argv[])
                     NewStr.assign(recvbuf, 1024);
                     while((pos = NewStr.find(delimiter)) != std::string::npos){
                         parsed.push_back(NewStr.substr(0, pos));
-                        NewStr.erase(0, pos+delimiter,length());
+                        NewStr.erase(0, pos+delimiter.length());
                     }
                     break;
 
