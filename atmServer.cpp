@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sstream>
+#include <thread>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -23,6 +24,8 @@
 enum erros {WSTARTUP, ABRESOCK, BIND, ACCEPT, LISTEN,RECEIVE};
 
 void TrataErro(SOCKET, int);
+
+void HandleClient(SOCKET, int);
 
 class AutoTellerMachine {         //Object to represent each customer                  who uses the ATM program
     public:
@@ -325,6 +328,7 @@ void AutoTellerMachine::AccountMenu() {         //This is a separate menu from t
 
 int main(int argc, char* argv[])
 {
+	/******** HANDLE LINE ARGUMENTS ********/ 
 	SOCKET s=0, s_cli;
  	struct sockaddr_in  addr_serv, addr_cli;
  	socklen_t addr_cli_len=sizeof(addr_cli);
@@ -350,6 +354,7 @@ int main(int argc, char* argv[])
 	}
 	char recvbuf[MAX_PACKET];
 
+	/********** HANDLE SOCKET CREATION **********/
 	// Cria o socket na familia AF_INET (Internet) e do tipo TCP (SOCK_STREAM)
 	if ((s = socket(AF_INET, SOCK_STREAM, 0))==INVALID_SOCKET){
 		TrataErro(s, ABRESOCK);	
@@ -371,9 +376,10 @@ int main(int argc, char* argv[])
 	}
 
 	// permite conexoes entrantes utilizarem o socket
-  	if((s_cli=accept(s, (struct sockaddr *)&addr_cli, (socklen_t *)&addr_cli_len)) < 0){
-	  	TrataErro(s, ACCEPT);
-  	}
+  	//if((s_cli=accept(s, (struct sockaddr *)&addr_cli, (socklen_t *)&addr_cli_len)) < 0){
+	  //	TrataErro(s, ACCEPT);
+  	//}
+
 
   	char ack[10] = "0";
   	char nack[10] = "1";
@@ -388,8 +394,47 @@ int main(int argc, char* argv[])
     std::ostringstream saldoContaStr;
     std::string stringConversao;
 
+    std::thread ClientHandlers[20];
+    int numClients = 0;
 
-  	while(1)
+    SOCKET Descritores[20];
+
+
+    while(1){
+    	if((Descritores[numClients]=accept(s, (struct sockaddr *)&addr_cli, (socklen_t *)&addr_cli_len)) > 0){
+    		ClientHandlers[numClients] = std::thread(HandleClient, Descritores[numClients], numClients);
+    		numClients++;
+  		}
+  		else{
+  			TrataErro(s, ACCEPT);
+  		}
+
+    }
+
+  printf("Fim da conexao\n");
+  close(s);
+  close(s_cli);
+  exit(1);
+}
+
+void HandleClient(SOCKET s_cli, int pid){
+
+	char recvbuf[MAX_PACKET];
+
+	char ack[10] = "0";
+  	char nack[10] = "1";
+    char saldo[10] = "2";
+  	std::string delimiter = "|";
+    char valorEmConta[30];
+    double saldoConta;
+  	size_t pos = 0;
+  	std::vector<std::string> parsed;
+  	std::string NewStr;
+  	std::string::size_type sz;
+    std::ostringstream saldoContaStr;
+    std::string stringConversao;
+
+    while(1)
   	{	
   		memset(recvbuf, '\0', 1024);
   		if((recv(s_cli, recvbuf, MAX_PACKET, 0)) > 0){
@@ -498,16 +543,13 @@ int main(int argc, char* argv[])
   			}
   		}
     }
-
-  printf("Fim da conexao\n");
-  close(s);
-  close(s_cli);
-  exit(1);
 }
+
+
 
 void TrataErro(SOCKET s, int tipoerro)
 {
-	char tipo[20];
+	char tipo[30];
 
 	switch(tipoerro) {
 		case WSTARTUP:
