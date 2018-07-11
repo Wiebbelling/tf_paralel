@@ -1,0 +1,24 @@
+Sistema para bancos:
+
+
+Pré-requisitos:
+
+- Sistema Linux
+- Compilador para c++11
+
+
+Juntamente com os fontes, você vai encontrar um makefile, para compilar todos os fontes e gerar o servidor e o cliente, basta digitar make no terminal, caso você queira gerar apenas cliente ou servidor, basta utilizar a regra "make server" ou "make client"
+
+Uso do Servidor:
+
+Para rodar o servidor, você deve exetuar o mesmo passando o parametro -p e a porta desejada para o servidor, ex: ./server -p 8080
+
+Dessa maneira, o servidor irá esperar as conexões na porta 8080
+
+Uso do cliente:
+
+Para utilizar o cliente, primeiramente você precisa saber a porta e o IP no qual o servidor irá ser executado.
+
+Uma vez definida o ip e a porta, vc deve abrir o fonte client.cpp e modificar a porta e o IP para os defindos para o servidor.
+
+Depois, compilar o cliente e executar o mesmo, sem nenhum parametro, você irá ver no seu terminar o menu de acesso ao terminal e as intruções de uso. Caso contrário, uma mensagem de erro será apresentada.

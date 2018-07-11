@@ -21,7 +21,7 @@ using std::cout;
 #include <arpa/inet.h>
 
 
-#define PORT 8080
+#define PORT 8000
 
 using namespace std;
 
@@ -277,7 +277,7 @@ int main() {
     serv_addr.sin_port = htons(PORT);
       
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0) 
+    if(inet_pton(AF_INET, "143.54.8.105", &serv_addr.sin_addr)<=0) 
     {
         printf("\n Endereço inválido ou não suportado\n");
         return -1;
