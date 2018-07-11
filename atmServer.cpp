@@ -1,11 +1,12 @@
 #include <iostream>
-	using std::cout;
+using std::cout;
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sstream>
 #include <thread>
+#include <mutex>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -14,7 +15,7 @@
 
 #include <iomanip>
 #include <vector>
-	using namespace std;
+using namespace std;
 #define	SOCKET	int
 #define INVALID_SOCKET  ((SOCKET)~0)
 
@@ -28,33 +29,33 @@ void TrataErro(SOCKET, int);
 void HandleClient(SOCKET, int);
 
 class AutoTellerMachine {         //Object to represent each customer                  who uses the ATM program
-    public:
-    void CreateNewAccount(string newUsername, string newPassword);
-    int AccountLogin(string loginUsername, string loginPassword);
-    void DepositMoney(double depositAmount);
-    void WithdrawMoney(double withdrawalAmount);
-    int Withdraw(double withdrawalAmount);
-    void SetAccountLogin(int setAccountLocation);
-    void SetLastMoneyMovement(int accountID, double amount);
-    void SetBeginningBalance(int accountID);
-    void SetLastOperation(int accountID, char userInput);
-    void AccountMenu();
-    int GetAccountLogin() const;
-    double GetLastMoneyMovement(int accountID) const;
-    double GetAccountBalance(int accountID) const;
-    double GetBeginningBalance(int accountID) const;
-    char GetLastOperation(int accountID) const;
-    string GetUsername(int accountID) const;
-    void logout();
+public:
+	void CreateNewAccount(string newUsername, string newPassword);
+	int AccountLogin(string loginUsername, string loginPassword);
+	void DepositMoney(double depositAmount);
+	void WithdrawMoney(double withdrawalAmount);
+	int Withdraw(double withdrawalAmount);
+	void SetAccountLogin(int setAccountLocation);
+	void SetLastMoneyMovement(int accountID, double amount);
+	void SetBeginningBalance(int accountID);
+	void SetLastOperation(int accountID, char userInput);
+	void AccountMenu();
+	int GetAccountLogin() const;
+	double GetLastMoneyMovement(int accountID) const;
+	double GetAccountBalance(int accountID) const;
+	double GetBeginningBalance(int accountID) const;
+	char GetLastOperation(int accountID) const;
+	string GetUsername(int accountID) const;
+	void logout();
 
-    private:
-    int loggedInAccountLocation;
-    double accountBalance;
-    double beginningBalance;
-    double lastMoneyMovement;
-    char lastOperation;
-    string username;
-    string password;
+private:
+	int loggedInAccountLocation;
+	double accountBalance;
+	double beginningBalance;
+	double lastMoneyMovement;
+	char lastOperation;
+	string username;
+	string password;
 };
 
 AutoTellerMachine account;
@@ -70,271 +71,273 @@ void AutoTellerMachine:: logout(){
 
 void AutoTellerMachine:: SetAccountLogin(int setAccountLocation) {
 
-    loggedInAccountLocation = setAccountLocation;
+	loggedInAccountLocation = setAccountLocation;
 
-    return;
+	return;
 }
 
 int AutoTellerMachine::GetAccountLogin() const {
 
-    return loggedInAccountLocation;
+	return loggedInAccountLocation;
 }
 
 void AutoTellerMachine::CreateNewAccount(string newUsername, string newPassword) {    //Adds the new information to the vector to give the account personalized info
 
-    int accountListSize = AccountList.size();
+	int accountListSize = AccountList.size();
 
-    AccountList.at(accountListSize - 1).accountBalance = 0.0;
-    AccountList.at(accountListSize - 1).username = newUsername;
-    AccountList.at(accountListSize - 1).password = newPassword;
+	AccountList.at(accountListSize - 1).accountBalance = 0.0;
+	AccountList.at(accountListSize - 1).username = newUsername;
+	AccountList.at(accountListSize - 1).password = newPassword;
 
 }
 
 int AutoTellerMachine::AccountLogin(string loginUsername, string loginPassword) {
 
-    int accountListSize = AccountList.size();
-    bool successfulLogin = false;
-    int accountLocation = 0;
+	int accountListSize = AccountList.size();
+	bool successfulLogin = false;
+	int accountLocation = 0;
 
-    for(int i = 0; i < accountListSize; i++) {
+	for(int i = 0; i < accountListSize; i++) {
 
-        if(loginUsername == AccountList.at(i).username) {
+		if(loginUsername == AccountList.at(i).username) {
 
-            if(loginPassword == AccountList.at(i).password) {
+			if(loginPassword == AccountList.at(i).password) {
 
-                successfulLogin = true;
-                accountLocation = i;
-            }
-        }                
-    }
+				successfulLogin = true;
+				accountLocation = i;
+			}
+		}                
+	}
 
-    if(successfulLogin != true) {
+	if(successfulLogin != true) {
 
-        return 1;
-    }
+		return 1;
+	}
 
-    else{//if(successfulLogin == true) {
+	else{//if(successfulLogin == true) {
 
-        SetAccountLogin(accountLocation);
-        cout << endl << "Access Granted - " << AccountList.at(loggedInAccountLocation).username << endl;
-        //AccountMenu();
-        return 0;
-    }
+		SetAccountLogin(accountLocation);
+		cout << endl << "Access Granted - " << AccountList.at(loggedInAccountLocation).username << endl;
+		//AccountMenu();
+		return 0;
+	}
 
 }
 
 void AutoTellerMachine::DepositMoney(double depositAmount) {
 
-    AccountList.at(loggedInAccountLocation).accountBalance += depositAmount;
+	AccountList.at(loggedInAccountLocation).accountBalance += depositAmount;
 
-    return;
+	return;
 }
 
 void AutoTellerMachine::WithdrawMoney(double withdrawalAmount) {
 
-    AccountList.at(loggedInAccountLocation).accountBalance -= withdrawalAmount;
+	AccountList.at(loggedInAccountLocation).accountBalance -= withdrawalAmount;
 
-    return;
+	return;
 }
 
 double AutoTellerMachine::GetAccountBalance(int accountID) const {
 
-    return AccountList.at(loggedInAccountLocation).accountBalance;
+	return AccountList.at(loggedInAccountLocation).accountBalance;
 }
 
 void AutoTellerMachine::SetLastMoneyMovement(int accountID, double amount) {
 
-    AccountList.at(accountID).lastMoneyMovement = amount;
+	AccountList.at(accountID).lastMoneyMovement = amount;
 }
 
 void AutoTellerMachine::SetBeginningBalance(int accountID) {
 
-    AccountList.at(accountID).beginningBalance = AccountList.at(loggedInAccountLocation).accountBalance;
+	AccountList.at(accountID).beginningBalance = AccountList.at(loggedInAccountLocation).accountBalance;
 }
 
 void AutoTellerMachine::SetLastOperation(int accountID, char userInput) {
 
-    AccountList.at(accountID).lastOperation = userInput;
+	AccountList.at(accountID).lastOperation = userInput;
 }
 
 double AutoTellerMachine::GetLastMoneyMovement(int accountID) const {
 
-    return AccountList.at(accountID).lastMoneyMovement;
+	return AccountList.at(accountID).lastMoneyMovement;
 }
 
 double AutoTellerMachine::GetBeginningBalance(int accountID) const {
 
-    return AccountList.at(accountID).beginningBalance;
+	return AccountList.at(accountID).beginningBalance;
 }
 
 char AutoTellerMachine::GetLastOperation(int accountID) const {
 
-    return AccountList.at(accountID).lastOperation;
+	return AccountList.at(accountID).lastOperation;
 }
 
 string AutoTellerMachine::GetUsername(int accountID) const {
 
-    return AccountList.at(GetAccountLogin()).username;
+	return AccountList.at(GetAccountLogin()).username;
 }
 
 void UserMenu() {   //Implements a user interface that allows the user to make selections based on what they want to do
 
-    char userSelection;
-    string createUserId;
-    string createUserPass;
-    string usernameCheck;
-    string passwordCheck;
+	char userSelection;
+	string createUserId;
+	string createUserPass;
+	string usernameCheck;
+	string passwordCheck;
 
-    cout << "l -> Login" << endl;
-    cout << "c -> Create New Account" << endl;
-    cout << "q -> Quit" << endl << endl << ">";
-    cin >> userSelection;
+	cout << "l -> Login" << endl;
+	cout << "c -> Create New Account" << endl;
+	cout << "q -> Quit" << endl << endl << ">";
+	cin >> userSelection;
 
-    if((userSelection == 'l') || (userSelection == 'L')) {  //Checks to make sure the login is valid and if not, couts an error statement
+	if((userSelection == 'l') || (userSelection == 'L')) {  //Checks to make sure the login is valid and if not, couts an error statement
 
-        cout << endl << "Please enter your user name: " << endl;
-        cin >> usernameCheck;
-        cout << "Please enter your password: " << endl;
-        cin >> passwordCheck;
+		cout << endl << "Please enter your user name: " << endl;
+		cin >> usernameCheck;
+		cout << "Please enter your password: " << endl;
+		cin >> passwordCheck;
 
-        account.AccountLogin(usernameCheck, passwordCheck);
+		account.AccountLogin(usernameCheck, passwordCheck);
 
-    }
+	}
 
-    else if((userSelection == 'c') || (userSelection == 'C')) {  //Captures info for a new account
+	else if((userSelection == 'c') || (userSelection == 'C')) {  //Captures info for a new account
 
-        cout << endl << "Please enter your user name: " << endl;
-        cin >> createUserId;
-        cout << "Please enter your password: " << endl;
-        cin >> createUserPass;
+		cout << endl << "Please enter your user name: " << endl;
+		cin >> createUserId;
+		cout << "Please enter your password: " << endl;
+		cin >> createUserPass;
 
-        AccountList.push_back(account);            //This creates a new object in the vector to be filled with the information gathered
+		AccountList.push_back(account);            //This creates a new object in the vector to be filled with the information gathered
 
-        account.CreateNewAccount(createUserId, createUserPass);
+		account.CreateNewAccount(createUserId, createUserPass);
 
-        cout << endl << "Thank You! Your account has been created!" << endl << endl;
+		cout << endl << "Thank You! Your account has been created!" << endl << endl;
 
-        UserMenu();
-    }
+		UserMenu();
+	}
 
-    else if((userSelection == 'q') || (userSelection == 'Q')) {   //Exits the entire program
+	else if((userSelection == 'q') || (userSelection == 'Q')) {   //Exits the entire program
 
-        cout << endl << "You selected quit!" << endl << endl;
-    }
+		cout << endl << "You selected quit!" << endl << endl;
+	}
 
-    else {
+	else {
 
-        cout << endl << "Invalid selection." << endl;
-        UserMenu();
-    }
+		cout << endl << "Invalid selection." << endl;
+		UserMenu();
+	}
 
-    return;
+	return;
 }
 
 int AutoTellerMachine::Withdraw(double withdrawalAmount){
-    if(withdrawalAmount > GetAccountBalance(GetAccountLogin())) {
-        return 1;
-    }
-    else{
-        return 0;
-    }
+	if(withdrawalAmount > GetAccountBalance(GetAccountLogin())) {
+		return 1;
+	}
+	else{
+		return 0;
+	}
 
 }
 
 void AutoTellerMachine::AccountMenu() {         //This is a separate menu from the user menu because it deals with all options available to a logged in customer
 
-    char userInput;
-    double amountOfDeposit;
-    double amountOfWithdrawal;
+	char userInput;
+	double amountOfDeposit;
+	double amountOfWithdrawal;
 
-    cout << endl << "d -> Deposit Money" << endl;   //This has a couple more options than indicated in our project overview, but I feel they make this a more useable program
-    cout << "w -> Withdraw Money" << endl;
-    cout << "r -> Request Balance" << endl;
-    cout << "z -> Logout" << endl;
-    cout << "q -> Quit" << endl;
-    cout << endl << ">";
-    cin >> userInput;
+	cout << endl << "d -> Deposit Money" << endl;   //This has a couple more options than indicated in our project overview, but I feel they make this a more useable program
+	cout << "w -> Withdraw Money" << endl;
+	cout << "r -> Request Balance" << endl;
+	cout << "z -> Logout" << endl;
+	cout << "q -> Quit" << endl;
+	cout << endl << ">";
+	cin >> userInput;
 
-    if((userInput == 'd') || (userInput == 'D')) {      //Deposit function that changes the balance of the account user and sets the last money movement for later use
+	if((userInput == 'd') || (userInput == 'D')) {      //Deposit function that changes the balance of the account user and sets the last money movement for later use
 
-        SetBeginningBalance(GetAccountLogin());
-        cout << endl <<  "Amount of deposit: " << endl;
-        cin >> amountOfDeposit;
-        SetLastMoneyMovement(GetAccountLogin(), amountOfDeposit);
-        SetLastOperation(GetAccountLogin(), userInput);
-        DepositMoney(amountOfDeposit);
-        AccountMenu();
-    }        
+		SetBeginningBalance(GetAccountLogin());
+		cout << endl <<  "Amount of deposit: " << endl;
+		cin >> amountOfDeposit;
+		SetLastMoneyMovement(GetAccountLogin(), amountOfDeposit);
+		SetLastOperation(GetAccountLogin(), userInput);
+		DepositMoney(amountOfDeposit);
+		AccountMenu();
+	}        
 
-    else if((userInput == 'w') || (userInput == 'W')) {   //Withdraw function makes sure that enough funds are present for the operation before removing money
+	else if((userInput == 'w') || (userInput == 'W')) {   //Withdraw function makes sure that enough funds are present for the operation before removing money
 
-        cout << endl << "Amount of withdrawal: " << endl;
-        cin >> amountOfWithdrawal;
+		cout << endl << "Amount of withdrawal: " << endl;
+		cin >> amountOfWithdrawal;
 
-        if(amountOfWithdrawal > GetAccountBalance(GetAccountLogin())) {
+		if(amountOfWithdrawal > GetAccountBalance(GetAccountLogin())) {
 
-            cout << endl << "******Insfficient Funds!*******" << endl;
-        }
+			cout << endl << "******Insfficient Funds!*******" << endl;
+		}
 
-        else {
+		else {
 
-           SetBeginningBalance(GetAccountLogin());
-           SetLastMoneyMovement(GetAccountLogin(), amountOfWithdrawal);
-           SetLastOperation(GetAccountLogin(), userInput);
-           WithdrawMoney(amountOfWithdrawal);
-        }
+			SetBeginningBalance(GetAccountLogin());
+			SetLastMoneyMovement(GetAccountLogin(), amountOfWithdrawal);
+			SetLastOperation(GetAccountLogin(), userInput);
+			WithdrawMoney(amountOfWithdrawal);
+		}
 
-        AccountMenu();
-    }
+		AccountMenu();
+	}
 
-    else if((userInput == 'r') || (userInput == 'R')) {   //Simply prints the balance before the last transaction, what type and amount the last transaction was then the current balance
+	else if((userInput == 'r') || (userInput == 'R')) {   //Simply prints the balance before the last transaction, what type and amount the last transaction was then the current balance
 
-        cout << endl << "Beginning balance: $" << fixed << setprecision(2) << GetBeginningBalance(GetAccountLogin()) << endl;
+		cout << endl << "Beginning balance: $" << fixed << setprecision(2) << GetBeginningBalance(GetAccountLogin()) << endl;
 
-        if(GetLastOperation(GetAccountLogin()) == 'd') {
+		if(GetLastOperation(GetAccountLogin()) == 'd') {
 
-            cout << "Deposit amount: $" << fixed << setprecision(2) << GetLastMoneyMovement(GetAccountLogin()) << endl;
-        }
+			cout << "Deposit amount: $" << fixed << setprecision(2) << GetLastMoneyMovement(GetAccountLogin()) << endl;
+		}
 
-        else if(GetLastOperation(GetAccountLogin()) == 'w') {
+		else if(GetLastOperation(GetAccountLogin()) == 'w') {
 
-            cout << "Withdrawal amount: $" << fixed << setprecision(2) << GetLastMoneyMovement(GetAccountLogin()) << endl;
-        }
+			cout << "Withdrawal amount: $" << fixed << setprecision(2) << GetLastMoneyMovement(GetAccountLogin()) << endl;
+		}
 
-        cout << "Your balance is $" << fixed << setprecision(2) << GetAccountBalance(GetAccountLogin()) << endl;
+		cout << "Your balance is $" << fixed << setprecision(2) << GetAccountBalance(GetAccountLogin()) << endl;
 
-        AccountMenu();
-    }
+		AccountMenu();
+	}
 
-    else if((userInput == 'z') || (userInput == 'Z')) {   //Allows the user to logout of their account and brings them back to the user menu so they can log in with a different account
+	else if((userInput == 'z') || (userInput == 'Z')) {   //Allows the user to logout of their account and brings them back to the user menu so they can log in with a different account
 
-        cout << endl << "You have successfully logged out, " << GetUsername(GetAccountLogin()) << "!" << endl << endl;
-        UserMenu();
-    }
+		cout << endl << "You have successfully logged out, " << GetUsername(GetAccountLogin()) << "!" << endl << endl;
+		UserMenu();
+	}
 
-    else if((userInput == 'q') || (userInput == 'Q')) {  //Exits the entire program
+	else if((userInput == 'q') || (userInput == 'Q')) {  //Exits the entire program
 
-        cout << endl << "Thanks for banking with COP2513.F16, " << GetUsername(GetAccountLogin()) << "!" << endl;
-    }
+		cout << endl << "Thanks for banking with COP2513.F16, " << GetUsername(GetAccountLogin()) << "!" << endl;
+	}
 
-    else {
+	else {
 
-        cout << endl << "Invalid selection." << endl;
-        AccountMenu();
-    }
+		cout << endl << "Invalid selection." << endl;
+		AccountMenu();
+	}
 
-    return;
+	return;
 }
+
+std::mutex mtx;
 
 int main(int argc, char* argv[])
 {
 	/******** HANDLE LINE ARGUMENTS ********/ 
 	SOCKET s=0, s_cli;
- 	struct sockaddr_in  addr_serv, addr_cli;
- 	socklen_t addr_cli_len=sizeof(addr_cli);
- 	int porta;
+	struct sockaddr_in  addr_serv, addr_cli;
+	socklen_t addr_cli_len=sizeof(addr_cli);
+	int porta;
 
- 	if(argc < 3) {
+	if(argc < 3) {
 		cout << "Usage: ./server -p <port>";
 		exit(1);
 	}
@@ -342,79 +345,79 @@ int main(int argc, char* argv[])
 		if(argv[i][0]=='-') {
 			switch(argv[i][1]) {				 
 			case 'p': // porta
-				i++;
-				porta = atoi(argv[i]);
-				if(porta < 1024) {
+			i++;
+			porta = atoi(argv[i]);
+			if(porta < 1024) {
 				cout << "Invalid port\n";
 				exit(1);
-				}
-			break;
 			}
+			break;
 		}
 	}
-	char recvbuf[MAX_PACKET];
+}
+char recvbuf[MAX_PACKET];
 
 	/********** HANDLE SOCKET CREATION **********/
 	// Cria o socket na familia AF_INET (Internet) e do tipo TCP (SOCK_STREAM)
-	if ((s = socket(AF_INET, SOCK_STREAM, 0))==INVALID_SOCKET){
-		TrataErro(s, ABRESOCK);	
-	}
+if ((s = socket(AF_INET, SOCK_STREAM, 0))==INVALID_SOCKET){
+	TrataErro(s, ABRESOCK);	
+}
 
 	// Define domínio, IP e porta a receber dados
-	addr_serv.sin_family = AF_INET;
-  	addr_serv.sin_addr.s_addr = htonl(INADDR_ANY); // recebe de qualquer IP
-  	addr_serv.sin_port = htons(porta);
+addr_serv.sin_family = AF_INET;
+	addr_serv.sin_addr.s_addr = htonl(INADDR_ANY); // recebe de qualquer IP
+	addr_serv.sin_port = htons(porta);
 
-  	// Associa socket com estrutura addr_serv
-  	if ((bind(s, (struct sockaddr *)&addr_serv, sizeof(addr_serv))) != 0){
+	// Associa socket com estrutura addr_serv
+	if ((bind(s, (struct sockaddr *)&addr_serv, sizeof(addr_serv))) != 0){
 		TrataErro(s, BIND);
-  	}
+	}
 
-  	// Coloca socket em estado de escuta para as conexoes na porta especificada
-  	if((listen(s, 8)) != 0){ // permite ateh 8 conexoes simultaneas
-	  	TrataErro(s, LISTEN);
+	// Coloca socket em estado de escuta para as conexoes na porta especificada
+	if((listen(s, 8)) != 0){ // permite ateh 8 conexoes simultaneas
+		TrataErro(s, LISTEN);
 	}
 
 	// permite conexoes entrantes utilizarem o socket
-  	//if((s_cli=accept(s, (struct sockaddr *)&addr_cli, (socklen_t *)&addr_cli_len)) < 0){
+	//if((s_cli=accept(s, (struct sockaddr *)&addr_cli, (socklen_t *)&addr_cli_len)) < 0){
 	  //	TrataErro(s, ACCEPT);
-  	//}
+	//}
 
 
-  	char ack[10] = "0";
-  	char nack[10] = "1";
-    char saldo[10] = "2";
-  	std::string delimiter = "|";
-    char valorEmConta[30];
-    double saldoConta;
-  	size_t pos = 0;
-  	std::vector<std::string> parsed;
-  	std::string NewStr;
-  	std::string::size_type sz;
-    std::ostringstream saldoContaStr;
-    std::string stringConversao;
+	char ack[10] = "0";
+	char nack[10] = "1";
+	char saldo[10] = "2";
+	std::string delimiter = "|";
+	char valorEmConta[30];
+	double saldoConta;
+	size_t pos = 0;
+	std::vector<std::string> parsed;
+	std::string NewStr;
+	std::string::size_type sz;
+	std::ostringstream saldoContaStr;
+	std::string stringConversao;
 
-    std::thread ClientHandlers[20];
-    int numClients = 0;
+	std::thread ClientHandlers[20];
+	int numClients = 0;
 
-    SOCKET Descritores[20];
+	SOCKET Descritores[20];
 
 
-    while(1){
-    	if((Descritores[numClients]=accept(s, (struct sockaddr *)&addr_cli, (socklen_t *)&addr_cli_len)) > 0){
-    		ClientHandlers[numClients] = std::thread(HandleClient, Descritores[numClients], numClients);
-    		numClients++;
-  		}
-  		else{
-  			TrataErro(s, ACCEPT);
-  		}
+	while(1){
+		if((Descritores[numClients]=accept(s, (struct sockaddr *)&addr_cli, (socklen_t *)&addr_cli_len)) > 0){
+			ClientHandlers[numClients] = std::thread(HandleClient, Descritores[numClients], numClients);
+			numClients++;
+		}
+		else{
+			TrataErro(s, ACCEPT);
+		}
 
-    }
+	}
 
-  printf("Fim da conexao\n");
-  close(s);
-  close(s_cli);
-  exit(1);
+	printf("Fim da conexao\n");
+	close(s);
+	close(s_cli);
+	exit(1);
 }
 
 void HandleClient(SOCKET s_cli, int pid){
@@ -422,127 +425,145 @@ void HandleClient(SOCKET s_cli, int pid){
 	char recvbuf[MAX_PACKET];
 
 	char ack[10] = "0";
-  	char nack[10] = "1";
-    char saldo[10] = "2";
-  	std::string delimiter = "|";
-    char valorEmConta[30];
-    double saldoConta;
-  	size_t pos = 0;
-  	std::vector<std::string> parsed;
-  	std::string NewStr;
-  	std::string::size_type sz;
-    std::ostringstream saldoContaStr;
-    std::string stringConversao;
+	char nack[10] = "1";
+	char saldo[10] = "2";
+	std::string delimiter = "|";
+	char valorEmConta[30];
+	double saldoConta;
+	size_t pos = 0;
+	std::vector<std::string> parsed;
+	std::string NewStr;
+	std::string::size_type sz;
+	std::ostringstream saldoContaStr;
+	std::string stringConversao;
 
-    while(1)
-  	{	
-  		memset(recvbuf, '\0', 1024);
-  		if((recv(s_cli, recvbuf, MAX_PACKET, 0)) > 0){
-  			printf("Message Received: %s\n", recvbuf);
-  			switch(recvbuf[0]){
-  				case 'q':
-  					if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
-  						printf("ACK SENDED\n");
-  					break;
-  				case 'l':
-  					NewStr.assign(recvbuf, 1024);
-  					while((pos = NewStr.find(delimiter)) != std::string::npos) {
-  						parsed.push_back(NewStr.substr(0, pos));
-  						NewStr.erase(0, pos + delimiter.length());
-  					}
-  					//std::cout << parsed[0] << parsed[1] << parsed[2] << parsed.size() << std::endl;
-  					if(account.AccountLogin(parsed[1], parsed[2])==1){
-  						if ((send(s_cli, (const char *)&nack, sizeof(nack),0)) > 0)
-  							printf("NACK SENDED\n");
-  					}
-  					else{
-  						if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
-  							printf("ACK SENDED\n");
-  					}
-  					parsed.clear();
-  					NewStr.clear();
-  					break;
-  				case 'c':
-  					NewStr.assign(recvbuf, 1024);
-  					while((pos = NewStr.find(delimiter)) != std::string::npos) {
-  						parsed.push_back(NewStr.substr(0, pos));
-  						NewStr.erase(0, pos + delimiter.length());
-  					}
-                    AccountList.push_back(account);
-  					account.CreateNewAccount(parsed[1], parsed[2]);
-  					if(account.AccountLogin(parsed[1], parsed[2])==0){
-                        account.DepositMoney(atof(parsed[3].c_str()));
-  						account.logout();
-  					}
-  					else{
-  						if ((send(s_cli, (const char *)&nack, sizeof(nack),0)) > 0)
-  							printf("NACK SENDED\n");
-  					}
+	while(1)
+	{	
+		memset(recvbuf, '\0', 1024);
+		if((recv(s_cli, recvbuf, MAX_PACKET, 0)) > 0){
+			printf("Message Received: %s\n", recvbuf);
+			switch(recvbuf[0]){
+				case 'q':
+				if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
+					printf("ACK SENDED\n");
+				break;
 
-  					if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
-  							printf("ACK SENDED\n");
-  					parsed.clear();
-  					NewStr.clear();
-  					break;
-                case 'd':
-                    NewStr.assign(recvbuf, 1024);
-                    while((pos = NewStr.find(delimiter)) != std::string::npos){
-                        parsed.push_back(NewStr.substr(0, pos));
-                        NewStr.erase(0, pos+delimiter.length());
-                    }
-                    account.SetBeginningBalance(account.GetAccountLogin());
-                    account.SetLastMoneyMovement(account.GetAccountLogin(), atof(parsed[1].c_str()));
-                    account.SetLastOperation(account.GetAccountLogin(), recvbuf[0]);
-                    account.DepositMoney(atof(parsed[1].c_str()));
-                    if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
-                        printf("ACK SENDED\n");
-                        parsed.clear();
-                        NewStr.clear();
-                    break;
-                case 'w':
-                    NewStr.assign(recvbuf, 1024);
-                    while((pos = NewStr.find(delimiter)) != std::string::npos){
-                        parsed.push_back(NewStr.substr(0, pos));
-                        NewStr.erase(0, pos+delimiter.length());
-                    }
-                    account.SetBeginningBalance(account.GetAccountLogin());
-                    if(account.Withdraw(atof(parsed[1].c_str()))==1){
-                        if ((send(s_cli, (const char *)&saldo, sizeof(saldo),0)) > 0)
-                            printf("SALDO INSUFICIENTE SENDED\n");
-                    }
-                    else{
-                        account.SetLastMoneyMovement(account.GetAccountLogin(), atof(parsed[1].c_str()));
-                        account.SetLastOperation(account.GetAccountLogin(), recvbuf[0]);
-                        account.WithdrawMoney(atof(parsed[1].c_str()));
-                        if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
-                            printf("ACK SENDED\n");
-                    }
-                    parsed.clear();
-                    NewStr.clear();
-                    break;
-                case 'r':
-                    NewStr.assign(recvbuf, 1024);
-                    while((pos = NewStr.find(delimiter)) != std::string::npos){
-                        parsed.push_back(NewStr.substr(0, pos));
-                        NewStr.erase(0, pos+delimiter.length());
-                    }
-                    saldoConta = account.GetAccountBalance(account.GetAccountLogin());
-                    saldoContaStr << saldoConta;
-                    stringConversao = saldoContaStr.str();
-                    memset(valorEmConta, '\0', 30);
-                    strcpy(&valorEmConta[1], stringConversao.c_str());
-                    if ((send(s_cli, (const char *)&valorEmConta, sizeof(valorEmConta),0)) > 0)
-                        printf("SALDO SENDED\n");
-                    break;
-                case 'z':
-                    account.logout();
-                    break;
+				case 'l':
+				NewStr.assign(recvbuf, 1024);
+				while((pos = NewStr.find(delimiter)) != std::string::npos) {
+					parsed.push_back(NewStr.substr(0, pos));
+					NewStr.erase(0, pos + delimiter.length());
+				}
+					//std::cout << parsed[0] << parsed[1] << parsed[2] << parsed.size() << std::endl;
+				mtx.lock();
+				if(account.AccountLogin(parsed[1], parsed[2])==1){
+					if ((send(s_cli, (const char *)&nack, sizeof(nack),0)) > 0)
+						printf("NACK SENDED\n");
+				}
+				else{
+					if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
+						printf("ACK SENDED\n");
+				}
 
-  				default:
-  					break;
-  			}
-  		}
-    }
+				parsed.clear();
+				NewStr.clear();
+				break;
+
+				case 'c':
+				NewStr.assign(recvbuf, 1024);
+				while((pos = NewStr.find(delimiter)) != std::string::npos) {
+					parsed.push_back(NewStr.substr(0, pos));
+					NewStr.erase(0, pos + delimiter.length());
+				}
+				mtx.lock();
+				AccountList.push_back(account);
+				account.CreateNewAccount(parsed[1], parsed[2]);
+				if(account.AccountLogin(parsed[1], parsed[2])==0){
+					account.DepositMoney(atof(parsed[3].c_str()));
+					account.logout();
+				}
+				else{
+					if ((send(s_cli, (const char *)&nack, sizeof(nack),0)) > 0)
+						printf("NACK SENDED\n");
+				}
+				mtx.unlock();
+
+				if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
+					printf("ACK SENDED\n");
+				parsed.clear();
+				NewStr.clear();
+				break;
+
+				case 'd':
+				NewStr.assign(recvbuf, 1024);
+				while((pos = NewStr.find(delimiter)) != std::string::npos){
+					parsed.push_back(NewStr.substr(0, pos));
+					NewStr.erase(0, pos+delimiter.length());
+				}
+				mtx.lock();
+				account.SetBeginningBalance(account.GetAccountLogin());
+				account.SetLastMoneyMovement(account.GetAccountLogin(), atof(parsed[1].c_str()));
+				account.SetLastOperation(account.GetAccountLogin(), recvbuf[0]);
+				account.DepositMoney(atof(parsed[1].c_str()));
+				mtx.unlock();
+				if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
+					printf("ACK SENDED\n");
+				parsed.clear();
+				NewStr.clear();
+				break;
+
+				case 'w':
+				NewStr.assign(recvbuf, 1024);
+				while((pos = NewStr.find(delimiter)) != std::string::npos){
+					parsed.push_back(NewStr.substr(0, pos));
+					NewStr.erase(0, pos+delimiter.length());
+				}
+				mtx.lock();
+				account.SetBeginningBalance(account.GetAccountLogin());
+				if(account.Withdraw(atof(parsed[1].c_str()))==1){
+					if ((send(s_cli, (const char *)&saldo, sizeof(saldo),0)) > 0)
+						printf("SALDO INSUFICIENTE SENDED\n");
+				}
+				else{
+					account.SetLastMoneyMovement(account.GetAccountLogin(), atof(parsed[1].c_str()));
+					account.SetLastOperation(account.GetAccountLogin(), recvbuf[0]);
+					account.WithdrawMoney(atof(parsed[1].c_str()));
+					if ((send(s_cli, (const char *)&ack, sizeof(ack),0)) > 0)
+						printf("ACK SENDED\n");
+				}
+				mtx.unlock();
+				parsed.clear();
+				NewStr.clear();
+				break;
+
+				case 'r':
+				NewStr.assign(recvbuf, 1024);
+				while((pos = NewStr.find(delimiter)) != std::string::npos){
+					parsed.push_back(NewStr.substr(0, pos));
+					NewStr.erase(0, pos+delimiter.length());
+				}
+				mtx.lock();
+				saldoConta = account.GetAccountBalance(account.GetAccountLogin());
+				saldoContaStr << saldoConta;
+				stringConversao = saldoContaStr.str();
+				mtx.unlock();
+				memset(valorEmConta, '\0', 30);
+				strcpy(&valorEmConta[1], stringConversao.c_str());
+				if ((send(s_cli, (const char *)&valorEmConta, sizeof(valorEmConta),0)) > 0)
+					printf("SALDO SENDED\n");
+				break;
+
+				case 'z':
+				mtx.lock();
+				account.logout();
+				mtx.unlock();
+				break;
+
+				default:
+				break;
+			}
+		}
+	}
 }
 
 
@@ -553,28 +574,28 @@ void TrataErro(SOCKET s, int tipoerro)
 
 	switch(tipoerro) {
 		case WSTARTUP:
-			strcpy(tipo, "Windows Startup");
-			break;
+		strcpy(tipo, "Windows Startup");
+		break;
 		case ABRESOCK:
-			strcpy(tipo, "Open Socket");
-			break;
+		strcpy(tipo, "Open Socket");
+		break;
 		case BIND:
-			strcpy(tipo, "Bind");
-			break;
+		strcpy(tipo, "Bind");
+		break;
 		case ACCEPT:
-			strcpy(tipo, "Accept");
-			break;
+		strcpy(tipo, "Accept");
+		break;
 		case LISTEN:
-			strcpy(tipo, "Listen");
-			break;
+		strcpy(tipo, "Listen");
+		break;
 		case RECEIVE:
-			strcpy(tipo, "Receive");
-			break;
+		strcpy(tipo, "Receive");
+		break;
 		default:
-			strcpy(tipo, "Indefinido. Verificar");
-			break;
+		strcpy(tipo, "Indefinido. Verificar");
+		break;
 	}
-    printf("erro no %s", tipo);
-    close(s);
-    exit(1);
+	printf("erro no %s", tipo);
+	close(s);
+	exit(1);
 }
